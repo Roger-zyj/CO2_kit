@@ -36,10 +36,10 @@ String sendAT(String command, uint32_t timeout = 2000, String expected1 = "OK", 
     Serial.print("---> ");
     Serial.println(command);
     SerialAT.println(command);
-    
+
     String resp = "";
     uint32_t start = millis();
-    
+
     while (millis() - start < timeout) {
         while (SerialAT.available()) {
             char c = SerialAT.read();
@@ -48,6 +48,8 @@ String sendAT(String command, uint32_t timeout = 2000, String expected1 = "OK", 
         if (expected1 != "" && resp.indexOf(expected1) != -1) break;
         if (expected2 != "" && resp.indexOf(expected2) != -1) break;
     }
+
+    Serial.println("<--- " + resp);   // <— add this
     return resp;
 }
 
@@ -62,46 +64,6 @@ String extractLocationHeader(String headers) {
     String redirectUrl = headers.substring(start, end);
     redirectUrl.trim();
     return redirectUrl;
-}
-
-// --- Cellular HTTP GET Execution ---
-void sendDataToGoogle(String fullUrl) {
-    Serial.println("\n[HTTP] Starting upload...");
-    
-    // Ensure HTTP stack is closed from any previous failed runs
-    sendAT("AT+HTTPTERM", 2000); 
-    
-    sendAT("AT+HTTPINIT", 3000);
-    sendAT("AT+HTTPPARA=\"SSLCFG\",0", 3000);
-    sendAT("AT+HTTPPARA=\"REDIR\",1", 3000);
-    sendAT("AT+HTTPPARA=\"URL\",\"" + fullUrl + "\"", 3000);
-
-    String actionResp = sendAT("AT+HTTPACTION=0", 30000, "+HTTPACTION:");
-
-    // Handle 302 Redirect
-    if (actionResp.indexOf("+HTTPACTION: 0,302") != -1) {
-        Serial.println("[HTTP] 302 Redirect detected. Following...");
-        String headerResp = sendAT("AT+HTTPHEAD", 10000);
-        String redirectUrl = extractLocationHeader(headerResp);
-
-        if (redirectUrl.length() > 0) {
-            sendAT("AT+HTTPTERM", 2000);
-            sendAT("AT+HTTPINIT", 3000);
-            sendAT("AT+HTTPPARA=\"SSLCFG\",0", 3000);
-            sendAT("AT+HTTPPARA=\"URL\",\"" + redirectUrl + "\"", 3000);
-            
-            actionResp = sendAT("AT+HTTPACTION=0", 30000, "+HTTPACTION:");
-        }
-    }
-
-    if (actionResp.indexOf("+HTTPACTION: 0,200") != -1) {
-        Serial.println("[SUCCESS] Data sent to Google Sheets!");
-    } else {
-        Serial.println("[ERROR] Failed to send data.");
-    }
-
-    // Cleanup
-    sendAT("AT+HTTPTERM", 2000);
 }
 
 
@@ -120,7 +82,7 @@ void setup() {
 
     SerialAT.begin(115200, SERIAL_8N1, MODEM_RX, MODEM_TX);
 
-    sendAT("ATE0"); // Disable echo
+    sendAT("ATE1"); // Disable echo
     sendAT("AT+CPIN?", 3000, "READY");
     sendAT("AT+CGDCONT=1,\"IP\",\"" + String(APN) + "\"", 3000);
     sendAT("AT+CGACT=1,1", 5000);
@@ -157,72 +119,12 @@ void setup() {
     // );
     // Serial.println("K30 UART Started");
     // Sensors init ------------------------------------------------------------------------
+
+    sendAT("AT+GMR", 3000);
+    sendAT("AT+SIMCOMATI", 3000);
 }
 
 void loop() {
-    // //---------------------------------------
-    // // Read BME688
-    // //---------------------------------------
-    // if(bme.performReading())
-    // {
-    //     Serial.println("========== BME688 ==========");
-    //     Serial.print("Temperature : ");
-    //     Serial.print(bme.temperature);
-    //     Serial.println(" C");
-    //     Serial.print("Humidity    : ");
-    //     Serial.print(bme.humidity);
-    //     Serial.println(" %");
-    //     Serial.print("Pressure    : ");
-    //     Serial.print(bme.pressure/100.0);
-    //     Serial.println(" hPa");
-    //     Serial.print("Gas         : ");
-    //     Serial.print(bme.gas_resistance);
-    //     Serial.println(" Ohms");
-    // }
-    // else
-    // {
-    //     Serial.println("BME688 Read Failed");
-    // }
-
-    // //---------------------------------------
-    // // Read K30
-    // //---------------------------------------
-    // int co2 = readCO2();
-    // Serial.println("========== K30 ==========");
-    // if(co2 > 0)
-    // {
-    //     Serial.print("CO2 : ");
-    //     Serial.print(co2);
-    //     Serial.println(" ppm");
-    // }
-    // else
-    // {
-    //     Serial.println("No response from K30");
-    // }
-    // Serial.println();
-    // Serial.println("------------------------------");
-    // Serial.println();
-
-    
-    // // --- Cellular + Upload REAL data ---
-    // String url = String(scriptURL)
-    //     + "?temp=" + String(bme.temperature)
-    //     + "&humidity=" + String(bme.humidity)
-    //     + "&pressure=" + String(bme.pressure / 100.0)
-    //     + "&gas=" + String(bme.gas_resistance)
-    //     + "&co2=" + String(co2);
-    // sendDataToGoogle(url);
-
-
-    // --- Cellular + Upload DUMMY data ---
-    String dummyUrl = String(scriptURL)
-        + "?temp=" + String(1)
-        + "&humidity=" + String(2)
-        + "&pressure=" + String(3)
-        + "&gas=" + String(4)
-        + "&co2=" + String(5);
-        
-    sendDataToGoogle(dummyUrl);
 
     // Delay before next cycle
     delay(5000);
