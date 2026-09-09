@@ -10,3 +10,6 @@ const char GPRS_PASS[] = "";
 // Paste your Google Apps Script Deployment ID here
 const char GAS_SCRIPT_ID[] = "AKfycbxGhwmJ-USPqrZp1MUHoBLk97MAPtWl1bBGX7-yO_24VzDoaGQqMl8Ee-I1tQGf4Kulqw";
 // ======================================================
+
+
+But the new batch of 7670 that we bought in bulk, it's a new design... so this doesn't work on the new batch of boards.
