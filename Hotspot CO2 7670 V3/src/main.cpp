@@ -12,20 +12,8 @@
 // LilyGO's official pin map for this board.
 // ---------------------------------------------------------------------------
 
-// const char* ssid = "rrpj";
-// const char* password = "9621097665";
 const char* ssid = "Roger's Phone";  // Works
 const char* password = "001.6022e-19";
-// const char* ssid = "shermswerms";
-// const char* password = "qwertyuiop";
-// const char* ssid = "yuan's phone (2)";
-// const char* password = "20031024cqy";
-// const char* ssid = "Pixel 7";  // Kush android works
-// const char* password = "hehehehehehehe";
-// const char* ssid = "Sam's iPhone";  // Sam iOS 26.6.1 works. Phillipines phone works??
-// const char* password = "Relosfam67";
-// const char* ssid = "Why no wifi";  // Zhen Ting andriod works.
-// const char* password = "12345678";
 
 const char* scriptURL =
 "https://script.google.com/macros/s/AKfycbyCrH6vVaznfHf4bLDbJxBdZjPP7FsokRXKmH5J4fwS1Ypp-JgbEafOhqvAiNBhBeNE/exec";
