@@ -13,7 +13,5 @@ Please use the following folders for SP3275 Fieldwork!
 
 
 If you need any help, feel free to contact Roger at
-
-Tele: @Roger_zyj
-
-Email: yijun.zhao23@sps.nus.edu.sg
+- Tele: @Roger_zyj
+- Email: yijun.zhao23@sps.nus.edu.sg
